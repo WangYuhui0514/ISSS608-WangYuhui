@@ -2,9 +2,9 @@
   {
     "objectID": "In-class_Ex/In-class_Ex01/In-class_Ex01.html",
     "href": "In-class_Ex/In-class_Ex01/In-class_Ex01.html",
-    "title": "Hands-on ex 1",
+    "title": "In-class ex 1",
     "section": "",
-    "text": "pacman::p_load(tidyverse, ggplot2)\n\n\nrealis &lt;- read_csv(\"data/realis2019.csv\")\n\n\nggplot(data = realis,\n       aes(x = 'Unit Price ($ psm)'))"
+    "text": "In the code chunk below, p_load() of pacman package is used to load tidyverse family of package.\n\npacman::p_load(tidyverse, ggplot2)\n\n\nrealis &lt;- read_csv(\"data/realis2019.csv\")\n\n\nif (is.factor(realis$`Unit Price ($ psm))`) || is.character(realis$`Unit Price ($ psm)`)) {\n  realis$`Unit Price ($ psm)` &lt;- as.numeric(as.character(realis$`Unit Price ($ psm)`))\n}\n\nggplot(data=realis, aes(x = `Unit Price ($ psm)`)) +\n  geom_histogram()"
   },
   {
     "objectID": "index.html",
@@ -110,5 +110,12 @@
     "title": "Useful Tips",
     "section": "",
     "text": "Text formatting\nitalics, bold, bold italics\n*italics*, **bold**, ***bold italics \"***\nsuperscript2 / subscript2\nsuperscript^2^ / subscript~2~\nstrikethrough\n~~strikethrough~~\nverbatim code\n`verbatim code`\n\n\nTables\n| Right | Left | Default | Center |\n|------:|:-----|---------|:------:|\n|   12  |  12  |    12   |    12  |\n|  123  |  123 |   123   |   123  |\n|    1  |    1 |     1   |     1  |\n\n\n\nRight\nLeft\nDefault\nCenter\n\n\n\n\n12\n12\n12\n12\n\n\n123\n123\n123\n123\n\n\n1\n1\n1\n1\n\n\n\n\n\nDiagrams\n```{mermaid}\nflowchart LR\n  A[Hard edge] --&gt; B(Round edge)\n  B --&gt; C{Decision}\n  C --&gt; D[Result one]\n  C --&gt; E[Result two]\n```\n\n\n\n\nflowchart LR\n  A[Hard edge] --&gt; B(Round edge)\n  B --&gt; C{Decision}\n  C --&gt; D[Result one]\n  C --&gt; E[Result two]\n\n\n\n\n\n\n\nMargin Figures\nFigures that you create using code cells can be placed in the margin by using the column: margin code cell option. If the code produces more than one figure, each of the figures will be placed in the margin.\n#| column: margin"
+  },
+  {
+    "objectID": "In-class_Ex/In-class_Ex01/In-class_Ex01.html#loading-r-packages",
+    "href": "In-class_Ex/In-class_Ex01/In-class_Ex01.html#loading-r-packages",
+    "title": "In-class ex 1",
+    "section": "",
+    "text": "In the code chunk below, p_load() of pacman package is used to load tidyverse family of package.\n\npacman::p_load(tidyverse, ggplot2)\n\n\nrealis &lt;- read_csv(\"data/realis2019.csv\")\n\n\nif (is.factor(realis$`Unit Price ($ psm))`) || is.character(realis$`Unit Price ($ psm)`)) {\n  realis$`Unit Price ($ psm)` &lt;- as.numeric(as.character(realis$`Unit Price ($ psm)`))\n}\n\nggplot(data=realis, aes(x = `Unit Price ($ psm)`)) +\n  geom_histogram()"
   }
 ]

@@ -23,10 +23,6 @@ realis <- read_csv("data/realis2019.csv")
 ```
 
 ```{r}
-if (is.factor(realis$`Unit Price ($ psm))`) || is.character(realis$`Unit Price ($ psm)`)) {
-  realis$`Unit Price ($ psm)` <- as.numeric(as.character(realis$`Unit Price ($ psm)`))
-}
-
 ggplot(data=realis, aes(x = `Unit Price ($ psm)`)) +
-  geom_histogram()
+  geom_histogram(binwidth = 300)
 ```
