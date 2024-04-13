@@ -1,9 +1,73 @@
 ---
-title: "About"
+title: "Useful Tips"
 ---
 
-About this site
+#  Text formatting
 
-```{r}
-1 + 1
+*italics*, **bold**, ***bold italics***
+
+```         
+*italics*, **bold**, ***bold italics "***
+```
+
+superscript^2^ / subscript~2~
+
+```         
+superscript^2^ / subscript~2~
+```
+
+~~strikethrough~~
+
+```         
+~~strikethrough~~
+```
+
+`verbatim code`
+
+```         
+`verbatim code`
+```
+
+# Tables
+
+```         
+| Right | Left | Default | Center |
+|------:|:-----|---------|:------:|
+|   12  |  12  |    12   |    12  |
+|  123  |  123 |   123   |   123  |
+|    1  |    1 |     1   |     1  |
+```
+
+| Right | Left | Default | Center |
+|------:|:-----|---------|:------:|
+|    12 | 12   | 12      |   12   |
+|   123 | 123  | 123     |  123   |
+|     1 | 1    | 1       |   1    |
+
+# Diagrams
+
+```` {style="color:black"}
+```{mermaid}
+flowchart LR
+  A[Hard edge] --> B(Round edge)
+  B --> C{Decision}
+  C --> D[Result one]
+  C --> E[Result two]
+```
+````
+
+```{mermaid}
+flowchart LR
+  A[Hard edge] --> B(Round edge)
+  B --> C{Decision}
+  C --> D[Result one]
+  C --> E[Result two]
+```
+
+# **Margin Figures**
+
+Figures that you create using code cells can be placed in the margin by using the `column: margin` code cell option. If the code produces more than one figure, each of the figures will be placed in the margin.
+
+```         
+#| column: margin
 ```

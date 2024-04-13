@@ -107,7 +107,7 @@ hist(exam_data$MATHS)
 ```
 :::
 
-::: important
+::: callout-important
 **Important:** The transferable skills from ggplot2 are not the idiosyncrasies of plotting syntax, but a powerful way of thinking about visualisation, as a way of mapping between variables and the visual properties of geometric objects that you can perceive.
 :::
 
@@ -163,9 +163,7 @@ Let us call the `ggplot()` function using the code chunk on the right.
 ggplot(data = exam_data)
 ```
 
-::: notes
-Note
-
+::: {.callout-note collapse="false"}
 -   A blank canvas appears.
 
 -   ggplot() initializes a ggplot object.
@@ -230,13 +228,11 @@ ggplot(data=exam_data,
   geom_dotplot(dotsize = 0.5)
 ```
 
-::: warn
-Warn
-
+::: callout-warning
 The y scale is not very useful, in fact it is very misleading.
 :::
 
-::: Note
+::: callout-note
 The code chunk below performs the following two steps:
 
 -   `scale_y_continuous()` is used to turn off the y-axis, and
@@ -264,7 +260,7 @@ ggplot(
   geom_histogram()
 ```
 
-::: notes
+::: callout-note
 Note
 
 The default bin is 30
@@ -300,13 +296,9 @@ ggplot(data=exam_data,
                  color="white")
 ```
 
-<div>
-
-Note
-
+::: callout-note
 This approach can be used to colour, fill and alpha of the geometric.
-
-</div>
+:::
 
 ### **1.7.6 Geometric Objects: geom-density()**
 
@@ -454,7 +446,7 @@ ggplot(data=exam_data,
              size=4)          
 ```
 
-::: {#.notes}
+::: callout-note
 Two output above look the same but use different method
 :::
 
@@ -530,7 +522,7 @@ ggplot(data=exam_data,
 
 The *Coordinates* functions map the position of objects onto the plane of the plot. There are a number of different possible coordinate systems to use, they are:
 
-::: important
+::: callout-important
 -   [`coord_cartesian()`](https://ggplot2.tidyverse.org/reference/coord_cartesian.html): the default cartesian coordinate systems, where you specify x and y values (e.g. allows you to zoom in or out).
 -   [`coord_flip()`](https://ggplot2.tidyverse.org/reference/coord_flip.html): a cartesian system with the x and y flipped.
 -   [`coord_fixed()`](https://ggplot2.tidyverse.org/reference/coord_fixed.html): a cartesian system with a "fixed" aspect ratio (e.g. 1.78 for a "widescreen" plot).

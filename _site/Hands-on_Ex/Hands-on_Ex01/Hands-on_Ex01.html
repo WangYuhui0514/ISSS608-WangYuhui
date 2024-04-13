@@ -127,6 +127,17 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </li>  
     </ul>
   </li>
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-in-class-exercise" role="button" data-bs-toggle="dropdown" aria-expanded="false" rel="" target="">
+ <span class="menu-text">In-class Exercise</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-in-class-exercise">    
+        <li>
+    <a class="dropdown-item" href="../../In-class_Ex/In-class_Ex01/In-class_Ex01.html" rel="" target="">
+ <span class="dropdown-text">In-class Exercise 1</span></a>
+  </li>  
+    </ul>
+  </li>
 </ul>
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
@@ -135,7 +146,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </li>  
   <li class="nav-item">
     <a class="nav-link" href="../../about.html" rel="" target="">
- <span class="menu-text">About</span></a>
+ <span class="menu-text">Useful Tips</span></a>
   </li>  
 </ul>
             <div class="quarto-navbar-tools">
@@ -350,8 +361,18 @@ dbl (3): ENGLISH, MATHS, SCIENCE
 </div>
 </div>
 </div>
-<div class="important">
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Important
+</div>
+</div>
+<div class="callout-body-container callout-body">
 <p><strong>Important:</strong> The transferable skills from ggplot2 are not the idiosyncrasies of plotting syntax, but a powerful way of thinking about visualisation, as a way of mapping between variables and the visual properties of geometric objects that you can perceive.</p>
+</div>
 </div>
 </section>
 </section>
@@ -395,14 +416,26 @@ dbl (3): ENGLISH, MATHS, SCIENCE
 <p><img src="Hands-on_Ex01_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
-<div class="notes">
-<p>Note</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="true" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-2" class="callout-2-contents callout-collapse collapse show">
+<div class="callout-body-container callout-body">
 <ul>
 <li><p>A blank canvas appears.</p></li>
 <li><p>ggplot() initializes a ggplot object.</p></li>
 <li><p>The data argument defines the dataset to be used for plotting.</p></li>
 <li><p>If the dataset is not already a data.frame, it will be converted to one by fortify().</p></li>
 </ul>
+</div>
+</div>
 </div>
 </section>
 <section id="essential-grammatical-elements-in-ggplot2-aesthetic-mappings" class="level2">
@@ -461,16 +494,35 @@ dbl (3): ENGLISH, MATHS, SCIENCE
 <p><img src="Hands-on_Ex01_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
-<div class="warn">
-<p>Warn</p>
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Warning
+</div>
+</div>
+<div class="callout-body-container callout-body">
 <p>The y scale is not very useful, in fact it is very misleading.</p>
 </div>
-<div class="Note">
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
 <p>The code chunk below performs the following two steps:</p>
 <ul>
 <li><p><code>scale_y_continuous()</code> is used to turn off the y-axis, and</p></li>
 <li><p><em>binwidth argument</em> is used to change the binwidth to 2.5.</p></li>
 </ul>
+</div>
 </div>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data=</span>exam_data, </span>
@@ -499,9 +551,19 @@ dbl (3): ENGLISH, MATHS, SCIENCE
 <p><img src="Hands-on_Ex01_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
-<div class="notes">
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
 <p>Note</p>
 <p>The default bin is 30</p>
+</div>
 </div>
 </section>
 <section id="modifying-a-geometric-object-by-changing-geom" class="level3">
@@ -538,9 +600,18 @@ dbl (3): ENGLISH, MATHS, SCIENCE
 <p><img src="Hands-on_Ex01_files/figure-html/unnamed-chunk-12-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
-<div>
-<p>Note</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
 <p>This approach can be used to colour, fill and alpha of the geometric.</p>
+</div>
 </div>
 </section>
 <section id="geometric-objects-geom-density" class="level3">
@@ -714,8 +785,18 @@ Ignoring unknown parameters: `fun.y`</code></pre>
 <p><img src="Hands-on_Ex01_files/figure-html/unnamed-chunk-22-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
-<div id=".notes">
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
 <p>Two output above look the same but use different method</p>
+</div>
 </div>
 </section>
 <section id="adding-a-best-fit-curve-on-a-scatterplot" class="level3">
@@ -809,13 +890,23 @@ Ignoring unknown parameters: `fun.y`</code></pre>
 <section id="essential-grammatical-elements-in-ggplot2-coordinates" class="level2">
 <h2 class="anchored" data-anchor-id="essential-grammatical-elements-in-ggplot2-coordinates"><strong>1.10 Essential Grammatical Elements in ggplot2: Coordinates</strong></h2>
 <p>The <em>Coordinates</em> functions map the position of objects onto the plane of the plot. There are a number of different possible coordinate systems to use, they are:</p>
-<div class="important">
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Important
+</div>
+</div>
+<div class="callout-body-container callout-body">
 <ul>
 <li><a href="https://ggplot2.tidyverse.org/reference/coord_cartesian.html"><code>coord_cartesian()</code></a>: the default cartesian coordinate systems, where you specify x and y values (e.g.&nbsp;allows you to zoom in or out).</li>
 <li><a href="https://ggplot2.tidyverse.org/reference/coord_flip.html"><code>coord_flip()</code></a>: a cartesian system with the x and y flipped.</li>
 <li><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html"><code>coord_fixed()</code></a>: a cartesian system with a “fixed” aspect ratio (e.g.&nbsp;1.78 for a “widescreen” plot).</li>
 <li><a href="https://ggplot2.tidyverse.org/reference/coord_map.html"><code>coord_quickmap()</code></a>: a coordinate system that approximates a good aspect ratio for maps.</li>
 </ul>
+</div>
 </div>
 <section id="working-with-coordinate" class="level3">
 <h3 class="anchored" data-anchor-id="working-with-coordinate"><strong>1.10.1 Working with Coordinate</strong></h3>

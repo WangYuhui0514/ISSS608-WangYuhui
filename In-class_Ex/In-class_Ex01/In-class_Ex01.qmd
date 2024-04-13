@@ -1,0 +1,32 @@
+---
+title: "In-class ex 1"
+author: "Wang Yuhui"
+date: "April 13, 2024"
+date-modified: "last-modified"
+execute: 
+  eval: true
+  echo: true
+  warning: false
+  freeze: true
+---
+
+## Loading R packages
+
+In the code chunk below, [p_load()](https://www.rdocumentation.org/packages/pacman/versions/0.5.1/topics/p_load) of [pacman](https://cran.r-project.org/web/packages/pacman/pacman.pdf) package is used to load tidyverse family of package.
+
+```{r}
+pacman::p_load(tidyverse, ggplot2)
+```
+
+```{r}
+realis <- read_csv("data/realis2019.csv")
+```
+
+```{r}
+if (is.factor(realis$`Unit Price ($ psm))`) || is.character(realis$`Unit Price ($ psm)`)) {
+  realis$`Unit Price ($ psm)` <- as.numeric(as.character(realis$`Unit Price ($ psm)`))
+}
+
+ggplot(data=realis, aes(x = `Unit Price ($ psm)`)) +
+  geom_histogram()
+```
