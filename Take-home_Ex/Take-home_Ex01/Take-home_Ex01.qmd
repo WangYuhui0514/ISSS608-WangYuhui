@@ -1,0 +1,51 @@
+---
+title: "Take Home Exercise 1: Creating data visualisation beyond default"
+author: "Wang Yuhui"
+date: "April 19, 2024"
+date-modified: "last-modified"
+execute: 
+  warning: false
+  freeze: true
+---
+
+# 1 Overview
+
+## 1.1 Background and Task
+
+There are two major residential property market in Singapore, namely public and private housing. Public housing aims to meet the basic need of the general public with monthly household income less than or equal to S\$14,000. For families with monthly household income more than S\$14,000, they need to turn to the private residential market.
+
+Assuming the role of a graphical editor of a median company, you are requested to prepare minimum two and maximum three data visualisation to reveal the private residential market and sub-markets of Singapore for the 1st quarter of 2024.
+
+## 1.2 Data
+
+To accomplish the task, transaction data of [REALIS](https://www.ura.gov.sg/reis/index) will be used. It is a complete set of the private residential property transaction data from 1st January 2023 to 31st March.
+
+# 2 Loading Packages
+
+The packages used in this report are listed following:
+
++------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Library    | Description                                                                                                                                                                                                                                                                                                       |
++:==========:+===================================================================================================================================================================================================================================================================================================================+
+| tidyverse  | This package is designed to make it easy to install and load multiple 'tidyverse' packages in a single step.                                                                                                                                                                                                      |
++------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| ggplot2    | A system for 'declaratively' creating graphics, based on "The Grammar of Graphics". You provide the data, tell 'ggplot2' how to map variables to aesthetics, what graphical primitives to use, and it takes care of the details.                                                                                  |
++------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| ggrepel    | Provides geoms for [ggplot2](https://ggplot2.tidyverse.org/) to repel overlapping text labels:                                                                                                                                                                                                                    |
+|            |                                                                                                                                                                                                                                                                                                                   |
+|            | -   `geom_text_repel()`                                                                                                                                                                                                                                                                                           |
+|            |                                                                                                                                                                                                                                                                                                                   |
+|            | -   `geom_label_repel()`                                                                                                                                                                                                                                                                                          |
+|            |                                                                                                                                                                                                                                                                                                                   |
+|            | Text labels repel away from each other, away from data points, and away from edges of the plotting area (panel).                                                                                                                                                                                                  |
++------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| patchwork  | 'Patchwork' is a package that expands the API to allow for arbitrarily complex composition of plots by, among others, providing mathematical operators for combining multiple plots.                                                                                                                              |
++------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| ggthemes   | Some extra themes, geoms, and scales for 'ggplot2'. Provides 'ggplot2' themes and scales that replicate the look of plots by Edward Tufte, Stephen Few, 'Fivethirtyeight', 'The Economist', 'Stata', 'Excel', and 'The Wall Street Journal', among others. Provides 'geoms' for Tufte's box plot and range frame. |
++------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| hrbrthemes | A compilation of extra 'ggplot2' themes, scales and utilities, including a spell check function for plot label fields and an overall emphasis on typography. A copy of the 'Google' font 'Roboto Condensed' is also included.                                                                                     |
++------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+```{r}
+pacman::p_load(tidyverse, ggplot2, ggrepel, patchwork, ggthemes, hrbrthemes)
+```

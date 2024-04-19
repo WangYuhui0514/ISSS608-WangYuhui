@@ -3,3 +3,13 @@ title: "ISSS-WangYuhui"
 ---
 
 Welcome to **ISSS608 Visual Analytics and Applications**. In this website, you will find my coursework prepared for this course.
+
+::: panel-tabset
+## Imaginary Data Analyst 
+
+![](images/Firefly%20想象中的数据分析师vs实际的数据分析师%2089498.jpg)
+
+## Actual Data Analyst
+
+![](images/Firefly 数据分析师（一个人在房间中对着电脑）（周围有一些垃圾）（人是不太干净的） 25096.jpg)
+:::
