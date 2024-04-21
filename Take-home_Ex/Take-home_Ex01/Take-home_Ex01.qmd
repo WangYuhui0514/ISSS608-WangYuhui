@@ -20,6 +20,17 @@ Assuming the role of a graphical editor of a median company, you are requested t
 
 To accomplish the task, transaction data of [REALIS](https://www.ura.gov.sg/reis/index) will be used. It is a complete set of the private residential property transaction data from 1st January 2023 to 31st March.
 
+```{r}
+data1 <- read.csv("data/ResidentialTransaction20240414220633.csv")
+data2 <- read.csv("data/ResidentialTransaction20240308161109.csv")
+data3 <- read.csv("data/ResidentialTransaction20240308161009.csv")
+data4 <- read.csv("data/ResidentialTransaction20240308160736.csv")
+data5 <- read.csv("data/ResidentialTransaction20240308160536.csv")
+
+rpm <- rbind(data1, data2, data3, data4, data5)
+# rpm refers to residential property market data
+```
+
 # 2 Loading Packages
 
 The packages used in this report are listed following:
@@ -45,7 +56,309 @@ The packages used in this report are listed following:
 +------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | hrbrthemes | A compilation of extra 'ggplot2' themes, scales and utilities, including a spell check function for plot label fields and an overall emphasis on typography. A copy of the 'Google' font 'Roboto Condensed' is also included.                                                                                     |
 +------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| dplyr      | A fast, consistent tool for working with data frame like objects, both in memory and out of memory.                                                                                                                                                                                                               |
++------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 
 ```{r}
-pacman::p_load(tidyverse, ggplot2, ggrepel, patchwork, ggthemes, hrbrthemes)
+pacman::p_load(tidyverse, ggplot2, ggrepel, patchwork, ggthemes, hrbrthemes, dplyr)
 ```
+
+# 3 Exploratory Data Analysis
+
+## 3.1 Convert and select the column
+
+First, let's see the type of each column
+
+```{r}
+rpm1 <- read_csv("data/rpm.csv")
+```
+
+We can see there are 22 columns in total, 12 of them are in characters type and 10 of them are in numbers type. Now we select the column we need and convert them to the right type.
+
+| Column                      | Type                                  |
+|-----------------------------|---------------------------------------|
+| Project Name                | character                             |
+| Transacted Price            | number                                |
+| Sale Date                   | date                                  |
+| Type of Sale                | character                             |
+| Type of Area                | character                             |
+| Area(SQM)                   | number                                |
+| Unit Price(Per SQM)         | number                                |
+| Property Type               | character                             |
+| Completion Date             | number (set all 'Uncompleted' as 2030 |
+| Purchaser Address Indicator | character                             |
+| Planning Region             | character                             |
+| Planning Area               | character                             |
+
+::: callout-note
+-   Set all uncompleted project date as 2030 to easier further analysis.
+:::
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
+rpm_processed <- rpm1 %>%
+  select(
+    Project.Name = Project.Name,
+    Transacted.Price.... = Transacted.Price....,
+    Sale.Date = Sale.Date,
+    Type.of.Sale = Type.of.Sale,
+    Type.of.Area = Type.of.Area,
+    Area..SQM. = Area..SQM.,
+    Unit.Price....PSM. = Unit.Price....PSM.,
+    Property.Type = Property.Type,
+    Completion.Date = Completion.Date,
+    Purchaser.Address.Indicator = Purchaser.Address.Indicator,
+    Planning.Region = Planning.Region,
+    Planning.Area = Planning.Area
+  ) %>%
+  mutate(
+    Project.Name = as.character(Project.Name),
+    Transacted.Price.... = as.numeric(Transacted.Price....),
+    Sale.Date = as.Date(Sale.Date),
+    Type.of.Sale = as.character(Type.of.Sale),
+    Type.of.Area = as.character(Type.of.Area),
+    Area..SQM. = as.numeric(Area..SQM.),
+    Unit.Price....PSM. = as.numeric(Unit.Price....PSM.),
+    Property.Type = as.character(Property.Type),
+    Completion.Date = ifelse(Completion.Date == "Uncompleted", 2030, as.numeric(Completion.Date)),
+    Purchaser.Address.Indicator = as.character(Purchaser.Address.Indicator),
+    Planning.Region = as.character(Planning.Region),
+    Planning.Area = as.character(Planning.Area)
+  )
+print(rpm_processed)
+
+rpm_processed <- rpm_processed %>%
+  rename(
+    `Project Name` = Project.Name,
+    `Transacted Price` = Transacted.Price....,
+    `Sale Date` = Sale.Date,
+    `Type of Sale` = Type.of.Sale,
+    `Type of Area` = Type.of.Area,
+    `Area SQM` = Area..SQM.,
+    `Unit Price PSM` = Unit.Price....PSM.,
+    `Property Type` = Property.Type,
+    `Completion Date` = Completion.Date,
+    `Purchaser Address Indicator` = Purchaser.Address.Indicator,
+    `Planning Region` = Planning.Region,
+    `Planning Area` = Planning.Area
+  )
+
+```
+
+## 3.2 Data Clean
+
+### 3.2.1 Remove missing values
+
+Check NA for all columns and remove them.
+
+```{r}
+colSums(is.na(rpm_processed))
+rpm_cleaned <- na.omit(rpm_processed)
+```
+
+::: callout-note
+There are a lot of missing value in column 'Purchaser address indicator'. However, we will visualize this section as a separate series
+:::
+
+## 3.3 Basic visualization
+
+### 3.3.1 HDB and Private unit price trends
+
+::: panel-tabset
+## Private unit price trends
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
+private_data <- rpm_cleaned %>%
+  filter(`Purchaser Address Indicator` == "Private"&
+         `Sale Date` >= as.Date("2024-01-01") &
+         `Sale Date` <= as.Date("2024-04-01")) %>%
+  group_by(`Sale Date`) %>%
+  summarise(`Unit Price PSM` = mean(`Unit Price PSM`, na.rm = TRUE))
+
+ggplot(private_data, aes(x = `Sale Date`, y = `Unit Price PSM`, group = 1)) +
+  geom_line() +
+  labs(title = "Unit Price PSM Over Time for Private",
+       x = "Sale Date",
+       y = "Unit Price PSM") +
+  theme_economist()
+```
+
+## Hdb price trends
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
+hdb_data <- rpm_cleaned %>%
+  filter(`Purchaser Address Indicator` == "HDB"&
+         `Sale Date` >= as.Date("2024-01-01") &
+         `Sale Date` <= as.Date("2024-04-01")) %>%
+  group_by(`Sale Date`) %>%
+  summarise(`Unit Price PSM` = mean(`Unit Price PSM`, na.rm = TRUE))
+
+ggplot(hdb_data, aes(x = `Sale Date`, y = `Unit Price PSM`, group = 1)) +
+  geom_line() +
+  labs(title = "Unit Price PSM Over Time for HDB",
+       x = "Sale Date",
+       y = "Unit Price PSM") +
+  theme_economist()
+```
+:::
+
+From the plot above, we can see the unit prices of Hdb and Private are both between 15000 and 30000. We need to analyze based on the region to visualize the price trend better.
+
+# 4 Analysis Visualization
+
+## 4.1 Price trend of each region
+
+::: panel-tabset
+## Plot
+
+![](images/clipboard-425342376.png)
+
+## Code
+
+```{r, eval=FALSE}
+avg_price_by_region_monthly <- rpm_cleaned %>%
+  mutate(`Month` = floor_date(`Sale Date`, "month")) %>%  
+  group_by(`Month`, `Planning Region`) %>%
+  summarise(`Unit Price PSM` = mean(`Unit Price PSM`, na.rm = TRUE)) %>%
+  ungroup() 
+
+ggplot(avg_price_by_region_monthly, aes(x = `Month`, y = `Unit Price PSM`, group = `Planning Region`, color = `Planning Region`)) +
+  geom_line() +
+  labs(title = "Unit Price PSM Over Time by Planning Region",
+       x = "Month",
+       y = "Unit Price PSM") +
+  theme_economist() +
+  theme(legend.position = "bottom",
+        legend.text = element_text(size = 6), 
+        plot.title = element_text(size = 10)) 
+```
+:::
+
+From the plot above, we can see that the highest average unit price is Central Region. It's not strange because Central Region is the most prosperous. However, the average price in areas other than the Central Region and East Region show an upward trend in 2023-2024.
+
+## 4.2 Price trends by type of sale
+
+::: panel-tabset
+## Plot
+
+![](images/clipboard-3875242054.png)
+
+## Code
+
+```{r, eval=FALSE}
+unitprice_typeofsale <- rpm_cleaned %>%
+  mutate(`Week` = floor_date(`Sale Date`, "week")) %>%  
+  filter(`Week` >= as.Date("2024-01-01") & `Week` < as.Date("2024-04-01")) %>%
+  group_by(`Week`, `Type of Sale`) %>%
+  summarise(`Average Unit Price PSM` = mean(`Unit Price PSM`, na.rm = TRUE)) %>%
+  ungroup() 
+
+completedate_typeofsale <- rpm_cleaned %>%
+  mutate(`Week` = floor_date(`Sale Date`, "week")) %>%  
+  filter(`Week` >= as.Date("2024-01-01") & `Week` < as.Date("2024-04-01")) %>%
+  group_by(`Week`, `Type of Sale`) %>%
+  summarise(`Average Completion Date` = mean(`Completion Date`, na.rm = TRUE)) %>%
+  ungroup()
+
+p1 <- ggplot(unitprice_typeofsale, aes(x = `Week`, y = `Average Unit Price PSM`, group = `Type of Sale`, color = `Type of Sale`)) +
+  geom_line() +
+  labs(title = "Average Unit Price PS by Type of Sale",
+       x = "Month",
+       y = "Average Unit Price PSM") +
+  theme_minimal() +
+  theme(legend.position = "left",
+        legend.text = element_text(size = 6), 
+        plot.title = element_text(size = 8))
+
+p2 <- ggplot(completedate_typeofsale, aes(x = `Week`, y = `Average Completion Date`, group = `Type of Sale`, color = `Type of Sale`)) +
+  geom_line() +
+  labs(title = "Average Completion Date by Type of Sale",
+       x = "Month",
+       y = "Average Completion Date") +
+  theme_minimal() +
+  theme(plot.title = element_text(size = 8))
+
+p1 <- p1 + theme(legend.position = "top")
+p2 <- p2 + theme(legend.position = "none")
+p1+p2
+```
+:::
+
+::: callout-note
+-   Set all uncompleted project date as 2030 to easier analysis.
+:::
+
+From the above plot, we can conclude that the price of New Sale in the first quarter of 2024 is higher than that of Sub Sale and Resale. This is because the houses in Resale are built earlier.
+
+## 4.3 Price trends by size
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
+rpm_cleaned <- rpm_cleaned %>%
+  mutate(Area_Category = cut(`Area SQM`,
+                             breaks = c(-Inf, 100, 200, 300, 400, 500, Inf),
+                             labels = c("0-100", "100-200", "200-300", "300-400", "400-500", ">500")))
+
+avg_price_by_area <- rpm_cleaned %>%
+  group_by(Area_Category) %>%
+  summarise(Average_Unit_Price_PSM = mean(`Unit Price PSM`, na.rm = TRUE)) %>%
+  ungroup()
+
+ggplot(avg_price_by_area, aes(x = Area_Category, y = Average_Unit_Price_PSM, fill = Area_Category)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  labs(title = "Average Unit Price PSM by Area SQM",
+       x = "Area (in m²)",
+       y = "Average Unit Price per m²") +
+  theme_economist() +
+  theme(legend.position = "none") 
+
+```
+
+From the plot above, we can see the unit price of size between 300-400 m² is the lowest and size from 0 to 100 holds the highest unit price.
+
+Now, what if we visualize the unit price by size by region?
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
+rpm_cleaned <- rpm_cleaned %>%
+  mutate(`Area Category` = cut(`Area SQM`,
+                             breaks = c(-Inf, 100, 200, 300, 400, 500, Inf),
+                             labels = c("0-100", "100-200", "200-300", "300-400", "400-500", ">500")))
+
+avg_price_by_area_region <- rpm_cleaned %>%
+  group_by(`Planning Region`, `Area Category`) %>%
+  summarise(Average_Unit_Price_PSM = mean(`Unit Price PSM`, na.rm = TRUE)) %>%
+  ungroup()
+
+ggplot(avg_price_by_area_region, aes(x = `Area Category`, y = Average_Unit_Price_PSM, fill = `Area Category`)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  facet_wrap(~ `Planning Region`, scales = "free_y") +
+  labs(title = "Average Unit Price PSM by Area SQM and Planning Region",
+       x = "Area SQM (in m²)",
+       y = "Average Unit Price per m²") +
+  theme_minimal() +
+  theme(legend.position = "bottom",
+        axis.text.x = element_blank(),
+        strip.text.x = element_text(size = 8))
+
+```
+
+After we separate the region, the price of each size shows a different trend. The price decreases when size increases in North East Region. But the unit price between 0-100 still remains the highest in all regions.
+
+# 5 Summary
+
+From the analysis of the above charts, we can conclude that from the perspective of home buyers, buying a resale type house of 300-400 m² in North Region is undoubtedly the most cost-effective. Of course, the actual situation needs to consider the needs of the homebuyers themselves, but in most areas, the average price per square meter of properties of 300-400 m² is the lowest.
+
+# 6 Reference
+
+1.  [Singapore Property Market Report Q4 2023 (propertyguru.com.sg)](https://www.propertyguru.com.sg/property-guides/singapore-property-market-report-q4-2023-89237)
+2.  [URA releases flash estimate of 1st Quarter 2024 private residential property price index](https://www.ura.gov.sg/Corporate/Media-Room/Media-Releases/pr24-11)
+3.  [Unsold private housing stock on the rise ahead of ramp-up in new launches in 2024](https://www.businesstimes.com.sg/property/unsold-private-housing-stock-rise-ahead-ramp-new-launches-2024)
+4.  [HDB resale prices rise 1.7%; private home prices up 1.5% in first quarter: Flash estimates](https://www.channelnewsasia.com/singapore/hdb-resale-private-home-prices-rise-waiting-period-property-analysts-4233876)
