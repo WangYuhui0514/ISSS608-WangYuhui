@@ -1,0 +1,9 @@
+---
+title: "Take Home Exercise 1: Creating data visualisation beyond default"
+author: "Wang Yuhui"
+date: "May 2, 2024"
+date-modified: "last-modified"
+execute: 
+  warning: false
+  freeze: true
+---
