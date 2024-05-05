@@ -1,5 +1,5 @@
 ---
-title: "Take Home Exercise 1: Creating data visualisation beyond default"
+title: "Take Home Exercise 2: Makeover"
 author: "Wang Yuhui"
 date: "May 2, 2024"
 date-modified: "last-modified"
@@ -7,3 +7,250 @@ execute:
   warning: false
   freeze: true
 ---
+
+# 1 OVERVIEW
+
+The purpose of the makeover is to improve on the original visualization. Focus on what works, what doesn’t work, why those things don’t work, and how you made it better. You should try stick to the fields in the data set provided and improve upon the original visualization. However, if supplementing the data helps you tell a better story, go for it!
+
+In this take-home exercise, you are required to:
+
+-   select **one data visualization** from the [Take-home Exercise 1 submission](https://isss608-ay2023-24apr.netlify.app/take-home_ex/th_ex01#peer-learning) prepared by your classmate,
+
+-   critic the submission in terms of clarity and aesthetics,
+
+-   prepare a sketch for the alternative design by using the data visualization design principles and best practices you had learned in Lesson 1 and 2.
+
+-   remake the original design by using ggplot2, ggplot2 extensions and tidyverse packages.
+
+# 2 GETTING STARTED
+
+## 2.1 Loading Packages
+
+To do this visualization makeover, we need these packages.
+
+-   tidyverse: an amalgamation of libraries for data handling (including ggplot2, dplyr, tidyr, readr, tibble)
+
+-   knitr: for creating dynamic html tables/reports
+
+-   ggridges: extension of ggplot2 designed for plotting ridgeline plots
+
+-   ggdist: extension of ggplot2 designed for visualising distribution and uncertainty,
+
+-   colorspace: provides a broad toolbox for selecting individual colors or color palettes, manipulating these colors, and employing them in various kinds of visualisations.
+
+-   ggrepel: provides geoms for ggplot2 to repel overlapping text labels.
+
+-   ggthemes: provides additional themes, geoms, and scales for ggplot package
+
+-   hrbrthemes: provides typography-centric themes and theme components for ggplot package
+
+-   patchwork: preparing composite figure created using ggplot package
+
+-   lubridate: for wrangling of date-time data
+
+```{r}
+pacman::p_load(tidyverse, knitr, ggridges, ggdist, 
+               colorspace, ggrepel, ggthemes, 
+               hrbrthemes, patchwork, lubridate, plotly) 
+```
+
+## 2.2 Data Preparation
+
+```{r}
+Realis24Q1 <- read_csv('data/ResidentialTransaction20240414220633.csv')
+
+Realis_merged <- read_csv('data/rpm.csv')
+```
+
+```{r}
+glimpse(Realis24Q1)
+```
+
+```{r}
+#Convert "-" values with no characters before and after to NA
+Realis24Q1 <- Realis24Q1 %>%
+  mutate_all(~ ifelse(grepl("^-$", .), NA, .))
+
+#Find the number of missing values for each col
+colSums(is.na(Realis24Q1))
+```
+
+```{r}
+#Convert "-" values with no characters before and after to NA
+Realis_merged <- Realis_merged %>%
+  mutate_all(~ ifelse(grepl("^-$", .), NA, .))
+
+#Find the number of missing values for each col
+colSums(is.na(Realis_merged))
+```
+
+```{r}
+# For version control, start by defining new transformed datasets as copies of original dataset
+Realis24Q1_trfm <- Realis24Q1
+Realis_merged_trfm <- Realis_merged
+
+# Convert Sale date to date data type
+Realis24Q1_trfm$`Sale Date` <- dmy(Realis24Q1$`Sale Date`)
+Realis_merged_trfm$`Sale Date` <- dmy(Realis_merged$`Sale.Date`)
+
+# For Completion Date, (1) filter out missing values, (2) Calculate age of property caa 2024, (3) set Uncompleted as age 0
+Realis24Q1_trfm <- Realis24Q1_trfm %>% filter(!is.na(`Completion Date`))
+Realis_merged_trfm <- Realis_merged_trfm %>% filter(!is.na(`Completion.Date`))
+Realis24Q1_trfm$`Completion Date`[Realis24Q1_trfm$`Completion Date` == "Uncompleted"] <- 2024
+Realis_merged_trfm$`Completion Date`[Realis_merged_trfm$`Completion.Date` == "Uncompleted"] <- 2024
+Realis24Q1_trfm$Property_Age <- 2024 - as.numeric(Realis24Q1_trfm$`Completion Date`)
+Realis_merged_trfm$Property_Age <- 2024 - as.numeric(Realis_merged_trfm$`Completion.Date`)
+
+# For number of units, filter out the multiple-property transactions as outliers
+Realis24Q1_trfm <- Realis24Q1_trfm %>% filter(`Number of Units` <= 1)
+Realis_merged_trfm <- Realis_merged_trfm %>% filter(`Number.of.Units` <= 1)
+
+# For Tenure, bin values into Leasehold and 999yrs/Freehold
+Realis24Q1_trfm <- Realis24Q1_trfm %>%
+  mutate(Tenure = case_when(
+    grepl("^Freehold", Tenure) ~ "999yrs/Freehold",
+    grepl("^9[0-9]{2}", Tenure) ~ "999yrs/Freehold",
+    TRUE ~ "Leasehold"
+  ))
+Realis_merged_trfm <- Realis_merged_trfm %>%
+  mutate(Tenure = case_when(
+    grepl("^Freehold", Tenure) ~ "999yrs/Freehold",
+    grepl("^9[0-9]{2}", Tenure) ~ "999yrs/Freehold",
+    TRUE ~ "Leasehold"
+  ))
+
+# Review transformed dataset
+glimpse(Realis24Q1_trfm)
+```
+
+# 3 Original Visualization
+
+```{r}
+# Create bar charts for each categorical variables
+plot1 <- ggplot(Realis24Q1_trfm, aes(x = `Number of Units`, y = `Property Type`)) +
+  geom_bar(stat = "identity", fill = "skyblue") +
+  labs(title = "Number of Units by Property Type", x = "Number of Units", y = "Property Type")
+
+plot2 <- ggplot(Realis24Q1_trfm, aes(x = `Number of Units`, y = `Planning Region`)) +
+  geom_bar(stat = "identity", fill = "lightgreen") +
+  labs(title = "Number of Units by Planning Region", x = "Number of Units", y = "Planning Region")
+
+plot3 <- ggplot(Realis24Q1_trfm, aes(x = `Number of Units`, y = `Type of Sale`)) +
+  geom_bar(stat = "identity", fill = "lightcoral") +
+  labs(title = "Number of Units by Type of Sale", x = "Number of Units", y = "Type of Sale")
+
+plot4 <- ggplot(Realis24Q1_trfm, aes(x = `Number of Units`, y = `Tenure`)) +
+  geom_bar(stat = "identity", fill = "lightpink") +
+  labs(title = "Number of Units by Tenure", x = "Number of Units", y = "Tenure")
+
+# Create a histogram for Property_Age
+plot5 <- ggplot(Realis24Q1_trfm, aes(x = Property_Age)) +
+  geom_histogram(bins = 30, fill = "lightblue") +
+  labs(title = "Histogram of Property Age", x = "Property Age")
+
+# Combine plots using operators
+(plot1 / plot2) | (plot3 / plot4) | plot5
+```
+
+# 4 ISSUES AND UPDATE
+
+The five plot show the Unit number varied by property type, planning region, type of sale, tenure and the histogram of property age. To better visualize the data, we need to add mean line to each plot, and also show a better distribution of the plot.
+
+```{r}
+# Number of Units by Property Type
+plot1 <- ggplot(Realis24Q1_trfm, aes(x = `Number of Units`, y = `Property Type`)) +
+  geom_bar(stat = "identity", fill = "skyblue") +
+  labs(title = "Number of Units by Property Type", x = "Number of Units", y = "Property Type") +
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 1), axis.title.y = element_blank())
+
+# Number of Units by Planning Region
+plot2 <- ggplot(Realis24Q1_trfm, aes(x = `Number of Units`, y = `Planning Region`)) +
+  geom_bar(stat = "identity", fill = "lightgreen") +
+  labs(title = "Number of Units by Planning Region", x = "Number of Units", y = "Planning Region") +
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 1), axis.title.y = element_blank())
+
+# Number of Units by Type of Sale
+plot3 <- ggplot(Realis24Q1_trfm, aes(x = `Number of Units`, y = `Type of Sale`)) +
+  geom_bar(stat = "identity", fill = "lightcoral") +
+  labs(title = "Number of Units by Type of Sale", x = "Number of Units", y = "Type of Sale") +
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 1), axis.title.y = element_blank())
+
+# Number of Units by Tenure
+plot4 <- ggplot(Realis24Q1_trfm, aes(x = `Number of Units`, y = `Tenure`)) +
+  geom_bar(stat = "identity", fill = "lightpink") +
+  labs(title = "Number of Units by Tenure", x = "Number of Units", y = "Tenure") +
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 1), axis.title.y = element_blank())
+
+# Arrange plots in a grid
+gridExtra::grid.arrange(plot1, plot2, plot3, plot4, nrow = 2, ncol = 2)
+
+```
+
+How about making the plot more interactive?
+
+```{r}
+plot5 <- ggplot(Realis24Q1_trfm, aes(x = Property_Age)) +
+  geom_histogram(bins = 50, fill = "lightblue", color = "white") +
+  labs(title = "Histogram of Property Age", x = "Property Age")
+
+interactive_plot5 <- ggplotly(plot5)
+interactive_plot5
+```
+
+::: panel-tabset
+## Number of Units by Property Type
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
+plot1 <- ggplot(Realis24Q1_trfm, aes(x = `Number of Units`, y = `Property Type`)) +
+  geom_bar(stat = "identity", fill = "skyblue") +
+  labs(title = "Number of Units by Property Type", x = "Number of Units", y = "Property Type") +
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 1), axis.title.y = element_blank())
+ggplotly(plot1)
+```
+
+## Number of Units by Planning Region
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
+plot2 <- ggplot(Realis24Q1_trfm, aes(x = `Number of Units`, y = `Planning Region`)) +
+  geom_bar(stat = "identity", fill = "lightgreen") +
+  labs(title = "Number of Units by Planning Region", x = "Number of Units", y = "Planning Region") +
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 1), axis.title.y = element_blank())
+ggplotly(plot2)
+```
+
+## Number of Units by Type of Sale
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
+plot3 <- ggplot(Realis24Q1_trfm, aes(x = `Number of Units`, y = `Type of Sale`)) +
+  geom_bar(stat = "identity", fill = "lightcoral") +
+  labs(title = "Number of Units by Type of Sale", x = "Number of Units", y = "Type of Sale") +
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 1), axis.title.y = element_blank())
+ggplotly(plot3)
+```
+
+## Number of Units by Tenure
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show the code"
+plot4 <- ggplot(Realis24Q1_trfm, aes(x = `Number of Units`, y = `Tenure`)) +
+  geom_bar(stat = "identity", fill = "lightpink") +
+  labs(title = "Number of Units by Tenure", x = "Number of Units", y = "Tenure") +
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 1), axis.title.y = element_blank())
+ggplotly(plot4)
+```
+:::
