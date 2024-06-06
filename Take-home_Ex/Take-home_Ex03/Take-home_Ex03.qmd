@@ -1,0 +1,19 @@
+---
+title: "Take Home Exercise 2: Makeover"
+author: "Wang Yuhui"
+date: "June 2, 2024"
+date-modified: "last-modified"
+execute: 
+  warning: false
+  freeze: true
+---
+
+# Learning Behavior Patterns Analysis
+
+# 1 Objective
+
+Analyze personalized learning behavior patterns based on learners' characteristics, and create and present learners' profiles from multiple perspectives, such as peak answering hours, preferred question types, correct answering rates, and more.
+
+# 2 Data Preparation
+
+## 2.1 Data Observation
