@@ -9,7 +9,7 @@
 <meta name="author" content="Wang Yuhui">
 <meta name="dcterms.date" content="2024-06-02">
 
-<title>ISSS-WangYuhui - Take Home Exercise 2: Makeover</title>
+<title>ISSS-WangYuhui - Take Home Exercise 3: Learning Behavior Patterns Analysis</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -21,6 +21,40 @@ ul.task-list li input[type="checkbox"] {
   width: 0.8em;
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 </style>
 
@@ -182,12 +216,21 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#learning-behavior-patterns-analysis" id="toc-learning-behavior-patterns-analysis" class="nav-link active" data-scroll-target="#learning-behavior-patterns-analysis">Learning Behavior Patterns Analysis</a></li>
-  <li><a href="#objective" id="toc-objective" class="nav-link" data-scroll-target="#objective">1 Objective</a></li>
+  <li><a href="#objective" id="toc-objective" class="nav-link active" data-scroll-target="#objective">1 Objective</a></li>
   <li><a href="#data-preparation" id="toc-data-preparation" class="nav-link" data-scroll-target="#data-preparation">2 Data Preparation</a>
   <ul class="collapse">
   <li><a href="#data-observation" id="toc-data-observation" class="nav-link" data-scroll-target="#data-observation">2.1 Data Observation</a></li>
+  <li><a href="#data-clean" id="toc-data-clean" class="nav-link" data-scroll-target="#data-clean">2.2 Data Clean</a>
+  <ul class="collapse">
+  <li><a href="#missing-value" id="toc-missing-value" class="nav-link" data-scroll-target="#missing-value">2.2.1 Missing Value</a></li>
+  <li><a href="#outliers" id="toc-outliers" class="nav-link" data-scroll-target="#outliers">2.2.2 Outliers</a></li>
+  <li><a href="#convert-datetime" id="toc-convert-datetime" class="nav-link" data-scroll-target="#convert-datetime">2.2.3 Convert datetime</a></li>
+  <li><a href="#match-the-unique-title_id-with-unique-knowledge" id="toc-match-the-unique-title_id-with-unique-knowledge" class="nav-link" data-scroll-target="#match-the-unique-title_id-with-unique-knowledge">2.2.4 Match the unique title_ID with unique knowledge</a></li>
+  <li><a href="#final-data" id="toc-final-data" class="nav-link" data-scroll-target="#final-data">2.2.5 Final data</a></li>
   </ul></li>
+  </ul></li>
+  <li><a href="#clustering-analysis" id="toc-clustering-analysis" class="nav-link" data-scroll-target="#clustering-analysis">3 Clustering Analysis</a></li>
+  <li><a href="#conclusions" id="toc-conclusions" class="nav-link" data-scroll-target="#conclusions">4 Conclusions</a></li>
   </ul>
 </nav>
     </div>
@@ -196,7 +239,7 @@ ul.task-list li input[type="checkbox"] {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Take Home Exercise 2: Makeover</h1>
+<h1 class="title">Take Home Exercise 3: Learning Behavior Patterns Analysis</h1>
 </div>
 
 
@@ -220,7 +263,7 @@ ul.task-list li input[type="checkbox"] {
     <div>
     <div class="quarto-title-meta-heading">Modified</div>
     <div class="quarto-title-meta-contents">
-      <p class="date-modified">June 4, 2024</p>
+      <p class="date-modified">June 9, 2024</p>
     </div>
   </div>
     
@@ -229,20 +272,629 @@ ul.task-list li input[type="checkbox"] {
 
 </header>
 
-<section id="learning-behavior-patterns-analysis" class="level1">
-<h1>Learning Behavior Patterns Analysis</h1>
-</section>
+<div class="cell">
+<details>
+<summary>show the code</summary>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyr)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(lubridate)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(cluster)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(factoextra)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(fmsb)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(reshape2)</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(networkD3)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
 <section id="objective" class="level1">
 <h1>1 Objective</h1>
-<p>Analyze personalized learning behavior patterns based on learners’ characteristics, and create and present learners’ profiles from multiple perspectives, such as peak answering hours, preferred question types, correct answering rates, and more.</p>
+<p>Mine <strong>personalized learning behavior patterns</strong> based on <strong>learners’ characteristics</strong>.</p>
+<p>Design and present <strong>learners’ profiles</strong> from various perspectives, including:</p>
+<p><strong>-peak answering hours,</strong></p>
+<p><strong>-preferred question types,</strong></p>
+<p><strong>-correct answering rates, etc.</strong></p>
 </section>
 <section id="data-preparation" class="level1">
 <h1>2 Data Preparation</h1>
 <section id="data-observation" class="level2">
 <h2 class="anchored" data-anchor-id="data-observation">2.1 Data Observation</h2>
-
-
+<p>first, we merge all the submission record.</p>
+<div class="cell">
+<details>
+<summary>show the code</summary>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>file1 <span class="ot">&lt;-</span> <span class="st">"data/Data_SubmitRecord/SubmitRecord-Class1.csv"</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>file2 <span class="ot">&lt;-</span> <span class="st">"data/Data_SubmitRecord/SubmitRecord-Class2.csv"</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>file3 <span class="ot">&lt;-</span> <span class="st">"data/Data_SubmitRecord/SubmitRecord-Class3.csv"</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>file4 <span class="ot">&lt;-</span> <span class="st">"data/Data_SubmitRecord/SubmitRecord-Class4.csv"</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>file5 <span class="ot">&lt;-</span> <span class="st">"data/Data_SubmitRecord/SubmitRecord-Class5.csv"</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>file6 <span class="ot">&lt;-</span> <span class="st">"data/Data_SubmitRecord/SubmitRecord-Class6.csv"</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>file7 <span class="ot">&lt;-</span> <span class="st">"data/Data_SubmitRecord/SubmitRecord-Class7.csv"</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>file8 <span class="ot">&lt;-</span> <span class="st">"data/Data_SubmitRecord/SubmitRecord-Class8.csv"</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>file9 <span class="ot">&lt;-</span> <span class="st">"data/Data_SubmitRecord/SubmitRecord-Class9.csv"</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>file10 <span class="ot">&lt;-</span> <span class="st">"data/Data_SubmitRecord/SubmitRecord-Class10.csv"</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>file11 <span class="ot">&lt;-</span> <span class="st">"data/Data_SubmitRecord/SubmitRecord-Class11.csv"</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>file12 <span class="ot">&lt;-</span> <span class="st">"data/Data_SubmitRecord/SubmitRecord-Class12.csv"</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>file13 <span class="ot">&lt;-</span> <span class="st">"data/Data_SubmitRecord/SubmitRecord-Class13.csv"</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>file14 <span class="ot">&lt;-</span> <span class="st">"data/Data_SubmitRecord/SubmitRecord-Class14.csv"</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>file15 <span class="ot">&lt;-</span> <span class="st">"data/Data_SubmitRecord/SubmitRecord-Class15.csv"</span></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="co"># 读取 CSV 文件</span></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>data1 <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(file1)</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>data2 <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(file2)</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>data3 <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(file3)</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>data4 <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(file4)</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>data5 <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(file5)</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>data6 <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(file6)</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>data7 <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(file7)</span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>data8 <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(file8)</span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>data9 <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(file9)</span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>data10 <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(file10)</span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>data11 <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(file11)</span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>data12 <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(file12)</span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>data13 <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(file13)</span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>data14 <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(file14)</span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>data15 <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(file15)</span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>submit_data <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(data1, data2, data3, data4, data5, data6, data7, data8, data9, data10, data11, data12, data13, data14, data15,)</span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(submit_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>  index  class       time              state score
+1     0 Class1 1704209872 Absolutely_Correct     3
+2     1 Class1 1704209852 Absolutely_Correct     3
+3     2 Class1 1704209838 Absolutely_Correct     3
+4     3 Class1 1704208923 Absolutely_Correct     3
+5     4 Class1 1704208359 Absolutely_Correct     4
+6     5 Class1 1704208330             Error1     0
+                       title_ID                      method memory timeconsume
+1 Question_bumGRTJ0c8p4v5D6eHZa Method_Cj9Ya2R7fZd6xs1q5mNQ    320           3
+2 Question_62XbhBvJ8NUSnApgDL94 Method_gj1NLb4Jn7URf9K2kQPd    356           3
+3 Question_ZTbD7mxr2OUp8Fz6iNjy Method_5Q4KoXthUuYz3bvrTDFm    196           2
+4 Question_xqlJkmRaP0otZcX4fK3W Method_m8vwGkEZc3TSW2xqYUoR    308           2
+5 Question_FNg8X9v5zcbB1tQrxHR3 Method_Cj9Ya2R7fZd6xs1q5mNQ    320           3
+6 Question_FNg8X9v5zcbB1tQrxHR3 Method_gj1NLb4Jn7URf9K2kQPd      0           5
+            student_ID
+1 8b6d1125760bd3939b6e
+2 8b6d1125760bd3939b6e
+3 8b6d1125760bd3939b6e
+4 63eef37311aaac915a45
+5 5d89810b20079366fcc2
+6 5d89810b20079366fcc2</code></pre>
+</div>
+<details>
+<summary>show the code</summary>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">write.csv</span>(submit_data, <span class="st">"data/submit_data.csv"</span>, <span class="at">row.names =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<p>Now we have 3 data sets in total, which are:</p>
+<ul>
+<li><p>Student information data</p></li>
+<li><p>Question title information</p></li>
+<li><p>Submission record information</p></li>
+</ul>
+<div class="cell">
+<details>
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>stu_info <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">'data/Data_Studentinfo.csv'</span>)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>tit_info <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">'data/Data_Titleinfo.csv'</span>)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>sub_info <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">'data/submit_data.csv'</span>)</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(stu_info)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>     index         student_ID            sex                 age       
+ Min.   :   1.0   Length:1364        Length:1364        Min.   :18.00  
+ 1st Qu.: 341.8   Class :character   Class :character   1st Qu.:19.00  
+ Median : 682.5   Mode  :character   Mode  :character   Median :21.00  
+ Mean   : 682.5                                         Mean   :21.05  
+ 3rd Qu.:1023.2                                         3rd Qu.:23.00  
+ Max.   :1364.0                                         Max.   :24.00  
+    major          
+ Length:1364       
+ Class :character  
+ Mode  :character  
+                   
+                   
+                   </code></pre>
+</div>
+<details>
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(tit_info)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>     index         title_ID             score        knowledge        
+ Min.   : 1.00   Length:44          Min.   :1.000   Length:44         
+ 1st Qu.:11.75   Class :character   1st Qu.:2.750   Class :character  
+ Median :22.50   Mode  :character   Median :3.000   Mode  :character  
+ Mean   :22.50                      Mean   :2.636                     
+ 3rd Qu.:33.25                      3rd Qu.:3.000                     
+ Max.   :44.00                      Max.   :4.000                     
+ sub_knowledge     
+ Length:44         
+ Class :character  
+ Mode  :character  
+                   
+                   
+                   </code></pre>
+</div>
+<details>
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(sub_info)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>     index          class                time              state          
+ Min.   :    0   Length:232818      Min.   :1.693e+09   Length:232818     
+ 1st Qu.: 3880   Class :character   1st Qu.:1.697e+09   Class :character  
+ Median : 7760   Mode  :character   Median :1.699e+09   Mode  :character  
+ Mean   : 7967                      Mean   :1.699e+09                     
+ 3rd Qu.:11640                      3rd Qu.:1.701e+09                     
+ Max.   :20201                      Max.   :1.706e+09                     
+     score          title_ID            method              memory       
+ Min.   :0.0000   Length:232818      Length:232818      Min.   :    0.0  
+ 1st Qu.:0.0000   Class :character   Class :character   1st Qu.:  188.0  
+ Median :0.0000   Mode  :character   Mode  :character   Median :  324.0  
+ Mean   :0.8991                                         Mean   :  347.3  
+ 3rd Qu.:2.0000                                         3rd Qu.:  356.0  
+ Max.   :4.0000                                         Max.   :65536.0  
+ timeconsume         student_ID       
+ Length:232818      Length:232818     
+ Class :character   Class :character  
+ Mode  :character   Mode  :character  
+                                      
+                                      
+                                      </code></pre>
+</div>
+</div>
 </section>
+<section id="data-clean" class="level2">
+<h2 class="anchored" data-anchor-id="data-clean">2.2 Data Clean</h2>
+<section id="missing-value" class="level3">
+<h3 class="anchored" data-anchor-id="missing-value">2.2.1 Missing Value</h3>
+<p>First, we check if there is missing value in these 3 data sets.</p>
+<div class="cell">
+<details>
+<summary>show the code</summary>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>missing_values1 <span class="ot">&lt;-</span> <span class="fu">colSums</span>(<span class="fu">is.na</span>(stu_info))</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(missing_values1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>     index student_ID        sex        age      major 
+         0          0          0          0          0 </code></pre>
+</div>
+<details>
+<summary>show the code</summary>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>missing_values2 <span class="ot">&lt;-</span> <span class="fu">colSums</span>(<span class="fu">is.na</span>(tit_info))</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(missing_values2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>        index      title_ID         score     knowledge sub_knowledge 
+            0             0             0             0             0 </code></pre>
+</div>
+<details>
+<summary>show the code</summary>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>missing_values3 <span class="ot">&lt;-</span> <span class="fu">colSums</span>(<span class="fu">is.na</span>(sub_info))</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(missing_values3)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>      index       class        time       state       score    title_ID 
+          0           0           0           0           0           0 
+     method      memory timeconsume  student_ID 
+          0           0           0           0 </code></pre>
+</div>
+</div>
+</section>
+<section id="outliers" class="level3">
+<h3 class="anchored" data-anchor-id="outliers">2.2.2 Outliers</h3>
+<p>There is no missing value in all 3 data sets. Now we see if there are outliers. :</p>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true">state</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false">class</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-3" role="tab" aria-controls="tabset-1-3" aria-selected="false">time consume</a></li></ul>
+<div class="tab-content">
+<div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
+<div class="cell">
+<details>
+<summary>show the code</summary>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>unique_state <span class="ot">&lt;-</span> <span class="fu">unique</span>(sub_info<span class="sc">$</span>state)</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(unique_state)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code> [1] "Absolutely_Correct" "Error1"             "Absolutely_Error"  
+ [4] "Error6"             "Error4"             "Partially_Correct" 
+ [7] "Error2"             "Error3"             "Error5"            
+[10] "Error7"             "Error8"             "Error9"            
+[13] "�������"           </code></pre>
+</div>
+</div>
+</div>
+<div id="tabset-1-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-2-tab">
+<div class="cell">
+<details>
+<summary>show the code</summary>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>unique_class <span class="ot">&lt;-</span> <span class="fu">unique</span>(sub_info<span class="sc">$</span>class)</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(unique_class)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code> [1] "Class1"  "class"   "Class2"  "Class3"  "Class4"  "Class5"  "Class6" 
+ [8] "Class7"  "Class8"  "Class9"  "Class10" "Class11" "Class12" "Class13"
+[15] "Class14" "Class15"</code></pre>
+</div>
+</div>
+</div>
+<div id="tabset-1-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-3-tab">
+<div class="cell">
+<details>
+<summary>show the code</summary>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>unique_timeconsume <span class="ot">&lt;-</span> <span class="fu">unique</span>(sub_info<span class="sc">$</span>timeconsume) </span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(unique_timeconsume)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>  [1] "3"   "2"   "5"   "4"   "1"   "9"   "6"   "--"  "18"  "61"  "7"   "59" 
+ [13] "10"  "8"   "12"  "13"  "16"  "15"  "183" "68"  "314" "64"  "60"  "11" 
+ [25] "96"  "94"  "58"  "67"  "54"  "17"  "122" "19"  "126" "14"  "91"  "50" 
+ [37] "21"  "40"  "23"  "20"  "80"  "31"  "118" "25"  "26"  "29"  "28"  "27" 
+ [49] "24"  "65"  "135" "63"  "103" "114" "258" "254" "85"  "66"  "69"  "90" 
+ [61] "132" "173" "48"  "34"  "272" "38"  "113" "116" "32"  "76"  "22"  "190"
+ [73] "187" "73"  "215" "123" "246" "146" "57"  "89"  "88"  "30"  "245" "75" 
+ [85] "285" "70"  "400" "205" "36"  "164" "163" "162" "165" "266" "62"  "172"
+ [97] "143" "184" "42"  "377" "160" "33"  "35"  "159" "182" "41"  "52"  "74" 
+[109] "72"  "46"  "264" "81"  "153" "83"  "82"  "39"  "37"  "56"  "-"   "115"
+[121] "55"  "286" "275" "331" "280" "274" "269" "288" "271" "136" "117" "276"
+[133] "277" "356" "79"  "147" "44"  "350" "394" "45"  "315" "321" "302" "152"
+[145] "309" "47"  "53"  "51"  "307" "201" "43"  "109" "326" "49"  "77"  "71" 
+[157] "385" "78"  "220" "217" "86"  "134" "84"  "106" "166" "124" "373" "289"</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<p>For outliers “�������” , simply remove it.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>valid_states <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Absolutely_Correct"</span>, <span class="st">"Absolutely_Error"</span>, <span class="st">"Error1"</span>, <span class="st">"Error2"</span>, <span class="st">"Error3"</span>, <span class="st">"Error4"</span>, <span class="st">"Error6"</span>, <span class="st">"Error7"</span>, <span class="st">"Error8"</span>, <span class="st">"Error9"</span>, <span class="st">"Partially_Correct"</span>)</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a><span class="co"># 过滤数据，只保留 state 列中包含指定值的行</span></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>sub_info <span class="ot">&lt;-</span> sub_info <span class="sc">%&gt;%</span></span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(state <span class="sc">%in%</span> valid_states)</span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a><span class="fu">unique</span>(sub_info<span class="sc">$</span>state)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> [1] "Absolutely_Correct" "Error1"             "Absolutely_Error"  
+ [4] "Error6"             "Error4"             "Partially_Correct" 
+ [7] "Error2"             "Error3"             "Error7"            
+[10] "Error8"             "Error9"            </code></pre>
+</div>
+</div>
+<p>For outliers “class” , replace with the highest frequency of the corresponding student_ID.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>replace_class <span class="ot">&lt;-</span> <span class="cf">function</span>(df) {</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>  df<span class="sc">$</span>class <span class="ot">&lt;-</span> <span class="fu">as.character</span>(df<span class="sc">$</span>class)</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>  class_indices <span class="ot">&lt;-</span> <span class="fu">which</span>(df<span class="sc">$</span>class <span class="sc">==</span> <span class="st">'class'</span>)</span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (index <span class="cf">in</span> class_indices) {</span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>    student_id <span class="ot">&lt;-</span> df<span class="sc">$</span>student_ID[index]</span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>    student_classes <span class="ot">&lt;-</span> df<span class="sc">$</span>class[df<span class="sc">$</span>student_ID <span class="sc">==</span> student_id <span class="sc">&amp;</span> df<span class="sc">$</span>class <span class="sc">!=</span> <span class="st">'class'</span>]</span>
+<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a>    class_counts <span class="ot">&lt;-</span> <span class="fu">table</span>(student_classes)</span>
+<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (<span class="fu">length</span>(class_counts) <span class="sc">&gt;</span> <span class="dv">0</span>) {</span>
+<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a>      most_common_class <span class="ot">&lt;-</span> <span class="fu">names</span>(<span class="fu">which.max</span>(class_counts))</span>
+<span id="cb25-13"><a href="#cb25-13" aria-hidden="true" tabindex="-1"></a>      df<span class="sc">$</span>class[index] <span class="ot">&lt;-</span> most_common_class</span>
+<span id="cb25-14"><a href="#cb25-14" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb25-15"><a href="#cb25-15" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb25-16"><a href="#cb25-16" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb25-17"><a href="#cb25-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(df)</span>
+<span id="cb25-18"><a href="#cb25-18" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb25-19"><a href="#cb25-19" aria-hidden="true" tabindex="-1"></a>sub_info <span class="ot">&lt;-</span> <span class="fu">replace_class</span>(sub_info)</span>
+<span id="cb25-20"><a href="#cb25-20" aria-hidden="true" tabindex="-1"></a><span class="fu">unique</span>(sub_info<span class="sc">$</span>class)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> [1] "Class1"  "Class2"  "Class3"  "Class4"  "Class5"  "Class6"  "Class7" 
+ [8] "Class8"  "Class9"  "Class10" "Class11" "Class12" "Class13" "Class14"
+[15] "Class15"</code></pre>
+</div>
+</div>
+<p>For outliers ‘-’ and ‘–’, remove the corresponding rows.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>sub_info <span class="ot">&lt;-</span> sub_info <span class="sc">%&gt;%</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span>(timeconsume <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">'-'</span>, <span class="st">'--'</span>)))</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a><span class="fu">unique</span>(sub_info<span class="sc">$</span>timeconsume)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  [1] "3"   "2"   "5"   "4"   "1"   "9"   "6"   "18"  "61"  "7"   "59"  "10" 
+ [13] "8"   "12"  "13"  "16"  "15"  "183" "68"  "314" "64"  "60"  "11"  "96" 
+ [25] "94"  "58"  "67"  "54"  "17"  "122" "19"  "126" "14"  "91"  "50"  "21" 
+ [37] "40"  "23"  "20"  "80"  "31"  "118" "25"  "26"  "29"  "28"  "27"  "24" 
+ [49] "65"  "135" "63"  "103" "114" "258" "254" "85"  "66"  "69"  "90"  "132"
+ [61] "173" "48"  "34"  "272" "38"  "113" "116" "32"  "76"  "22"  "190" "187"
+ [73] "73"  "215" "123" "246" "146" "57"  "89"  "88"  "30"  "245" "75"  "285"
+ [85] "70"  "400" "205" "36"  "164" "163" "162" "165" "266" "62"  "172" "143"
+ [97] "184" "42"  "377" "160" "33"  "35"  "159" "182" "41"  "52"  "74"  "72" 
+[109] "46"  "264" "81"  "153" "83"  "82"  "39"  "37"  "56"  "115" "55"  "286"
+[121] "275" "331" "280" "274" "269" "288" "271" "136" "117" "276" "277" "79" 
+[133] "147" "44"  "350" "394" "45"  "315" "321" "302" "152" "47"  "53"  "51" 
+[145] "307" "201" "43"  "109" "326" "49"  "77"  "71"  "385" "78"  "220" "217"
+[157] "86"  "134" "84"  "106" "166" "124" "373" "289"</code></pre>
+</div>
+</div>
+<p>Save the dataset and name it ‘sub_info.csv’</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">write.csv</span>(sub_info, <span class="st">'data/sub_info.csv'</span>, <span class="at">row.names =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(sub_info)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  index  class       time              state score
+1     0 Class1 1704209872 Absolutely_Correct     3
+2     1 Class1 1704209852 Absolutely_Correct     3
+3     2 Class1 1704209838 Absolutely_Correct     3
+4     3 Class1 1704208923 Absolutely_Correct     3
+5     4 Class1 1704208359 Absolutely_Correct     4
+6     5 Class1 1704208330             Error1     0
+                       title_ID                      method memory timeconsume
+1 Question_bumGRTJ0c8p4v5D6eHZa Method_Cj9Ya2R7fZd6xs1q5mNQ    320           3
+2 Question_62XbhBvJ8NUSnApgDL94 Method_gj1NLb4Jn7URf9K2kQPd    356           3
+3 Question_ZTbD7mxr2OUp8Fz6iNjy Method_5Q4KoXthUuYz3bvrTDFm    196           2
+4 Question_xqlJkmRaP0otZcX4fK3W Method_m8vwGkEZc3TSW2xqYUoR    308           2
+5 Question_FNg8X9v5zcbB1tQrxHR3 Method_Cj9Ya2R7fZd6xs1q5mNQ    320           3
+6 Question_FNg8X9v5zcbB1tQrxHR3 Method_gj1NLb4Jn7URf9K2kQPd      0           5
+            student_ID
+1 8b6d1125760bd3939b6e
+2 8b6d1125760bd3939b6e
+3 8b6d1125760bd3939b6e
+4 63eef37311aaac915a45
+5 5d89810b20079366fcc2
+6 5d89810b20079366fcc2</code></pre>
+</div>
+</div>
+</section>
+<section id="convert-datetime" class="level3">
+<h3 class="anchored" data-anchor-id="convert-datetime">2.2.3 Convert datetime</h3>
+<p>The time span is from August 31, 2023 to January 25, 2024, a total of 148 days. However, the content in column ‘time’ is actually in seconds. So we need to convert to datetime.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>sub_info <span class="ot">&lt;-</span> sub_info <span class="sc">%&gt;%</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">day =</span> <span class="fu">wday</span>(<span class="fu">as.POSIXct</span>(time, <span class="at">origin =</span> <span class="st">"1970-01-01"</span>, <span class="at">tz =</span> <span class="st">"UTC"</span>), <span class="at">week_start =</span> <span class="dv">1</span>))</span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a><span class="fu">unique</span>(sub_info<span class="sc">$</span>day)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 2 1 6 5 4 7 3</code></pre>
+</div>
+</div>
+</section>
+<section id="match-the-unique-title_id-with-unique-knowledge" class="level3">
+<h3 class="anchored" data-anchor-id="match-the-unique-title_id-with-unique-knowledge">2.2.4 Match the unique title_ID with unique knowledge</h3>
+<p>From the code below we can see some titles match multiple knowledge</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>title_knowledge_check <span class="ot">&lt;-</span> tit_info <span class="sc">%&gt;%</span></span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(title_ID) <span class="sc">%&gt;%</span></span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">knowledge_count =</span> <span class="fu">n_distinct</span>(knowledge)) <span class="sc">%&gt;%</span></span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(knowledge_count <span class="sc">&gt;</span> <span class="dv">1</span>)</span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(title_knowledge_check)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 5 × 2
+  title_ID                      knowledge_count
+  &lt;chr&gt;                                   &lt;int&gt;
+1 Question_QRm48lXxzdP7Tn1WgNOf               2
+2 Question_lU2wvHSZq7m43xiVroBc               2
+3 Question_oCjnFLbIs4Uxwek9rBpu               2
+4 Question_pVKXjZn0BkSwYcsa7C31               2
+5 Question_x2Fy7rZ3SwYl9jMQkpOD               2</code></pre>
+</div>
+</div>
+<p>Since we don’t know when the students submit the questions, which knowledge they actually focus on, so we use the probability to match the knowledge.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>title_knowledge_count <span class="ot">&lt;-</span> tit_info <span class="sc">%&gt;%</span></span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(title_ID) <span class="sc">%&gt;%</span></span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">knowledge_list =</span> <span class="fu">list</span>(<span class="fu">unique</span>(knowledge))) <span class="sc">%&gt;%</span></span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">knowledge =</span> <span class="fu">sapply</span>(knowledge_list, <span class="cf">function</span>(x) <span class="fu">ifelse</span>(<span class="fu">length</span>(x) <span class="sc">&gt;</span> <span class="dv">0</span>, x[<span class="dv">1</span>], <span class="cn">NA</span>)),</span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a>         <span class="at">knowledge1 =</span> <span class="fu">sapply</span>(knowledge_list, <span class="cf">function</span>(x) <span class="fu">ifelse</span>(<span class="fu">length</span>(x) <span class="sc">&gt;</span> <span class="dv">1</span>, x[<span class="dv">2</span>], <span class="cn">NA</span>))) <span class="sc">%&gt;%</span></span>
+<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>knowledge_list)</span>
+<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-8"><a href="#cb35-8" aria-hidden="true" tabindex="-1"></a><span class="co"># 合并知识信息到sub_info</span></span>
+<span id="cb35-9"><a href="#cb35-9" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>) <span class="co"># 确保结果可重复</span></span>
+<span id="cb35-10"><a href="#cb35-10" aria-hidden="true" tabindex="-1"></a>sub_info <span class="ot">&lt;-</span> sub_info <span class="sc">%&gt;%</span></span>
+<span id="cb35-11"><a href="#cb35-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(title_knowledge_count, <span class="at">by =</span> <span class="st">"title_ID"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb35-12"><a href="#cb35-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rowwise</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb35-13"><a href="#cb35-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">knowledge =</span> <span class="fu">ifelse</span>(<span class="sc">!</span><span class="fu">is.na</span>(knowledge1), </span>
+<span id="cb35-14"><a href="#cb35-14" aria-hidden="true" tabindex="-1"></a>                            <span class="fu">sample</span>(<span class="fu">c</span>(knowledge, knowledge1), <span class="dv">1</span>), </span>
+<span id="cb35-15"><a href="#cb35-15" aria-hidden="true" tabindex="-1"></a>                            knowledge)) <span class="sc">%&gt;%</span></span>
+<span id="cb35-16"><a href="#cb35-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb35-17"><a href="#cb35-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>knowledge1)</span>
+<span id="cb35-18"><a href="#cb35-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-19"><a href="#cb35-19" aria-hidden="true" tabindex="-1"></a><span class="co"># 查看处理后的数据框前几行</span></span>
+<span id="cb35-20"><a href="#cb35-20" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(sub_info)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 12
+  index class     time state score title_ID method memory timeconsume student_ID
+  &lt;int&gt; &lt;chr&gt;    &lt;int&gt; &lt;chr&gt; &lt;int&gt; &lt;chr&gt;    &lt;chr&gt;   &lt;int&gt; &lt;chr&gt;       &lt;chr&gt;     
+1     0 Class1  1.70e9 Abso…     3 Questio… Metho…    320 3           8b6d11257…
+2     1 Class1  1.70e9 Abso…     3 Questio… Metho…    356 3           8b6d11257…
+3     2 Class1  1.70e9 Abso…     3 Questio… Metho…    196 2           8b6d11257…
+4     3 Class1  1.70e9 Abso…     3 Questio… Metho…    308 2           63eef3731…
+5     4 Class1  1.70e9 Abso…     4 Questio… Metho…    320 3           5d89810b2…
+6     5 Class1  1.70e9 Erro…     0 Questio… Metho…      0 5           5d89810b2…
+# ℹ 2 more variables: day &lt;dbl&gt;, knowledge &lt;chr&gt;</code></pre>
+</div>
+</div>
+<p>Finally, we need to calculate the average answering correct rate and average consuming time for each student.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>sub_info <span class="ot">&lt;-</span> sub_info <span class="sc">%&gt;%</span></span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(tit_info <span class="sc">%&gt;%</span> <span class="fu">select</span>(title_ID, score), <span class="at">by =</span> <span class="st">"title_ID"</span>)</span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>sub_info <span class="ot">&lt;-</span> sub_info <span class="sc">%&gt;%</span></span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">rate =</span> score.x <span class="sc">/</span> score.y) <span class="sc">%&gt;%</span></span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>score.x, <span class="sc">-</span>score.y)</span>
+<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-7"><a href="#cb37-7" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(sub_info)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 12
+  index class     time state title_ID method memory timeconsume student_ID   day
+  &lt;int&gt; &lt;chr&gt;    &lt;int&gt; &lt;chr&gt; &lt;chr&gt;    &lt;chr&gt;   &lt;int&gt; &lt;chr&gt;       &lt;chr&gt;      &lt;dbl&gt;
+1     0 Class1  1.70e9 Abso… Questio… Metho…    320 3           8b6d11257…     2
+2     1 Class1  1.70e9 Abso… Questio… Metho…    356 3           8b6d11257…     2
+3     2 Class1  1.70e9 Abso… Questio… Metho…    196 2           8b6d11257…     2
+4     3 Class1  1.70e9 Abso… Questio… Metho…    308 2           63eef3731…     2
+5     4 Class1  1.70e9 Abso… Questio… Metho…    320 3           5d89810b2…     2
+6     5 Class1  1.70e9 Erro… Questio… Metho…      0 5           5d89810b2…     2
+# ℹ 2 more variables: knowledge &lt;chr&gt;, rate &lt;dbl&gt;</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="fu">write.csv</span>(sub_info,<span class="st">'data/sub_info.csv'</span>,<span class="at">row.names =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="final-data" class="level3">
+<h3 class="anchored" data-anchor-id="final-data">2.2.5 Final data</h3>
+<p>Now we merged with student information and rearrange the column for the further analysis.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 计算每个学生的平均rate</span></span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>avg_rate <span class="ot">&lt;-</span> sub_info <span class="sc">%&gt;%</span></span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(student_ID) <span class="sc">%&gt;%</span></span>
+<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">average_rate =</span> <span class="fu">mean</span>(rate, <span class="at">na.rm =</span> <span class="cn">TRUE</span>))</span>
+<span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-6"><a href="#cb40-6" aria-hidden="true" tabindex="-1"></a><span class="co"># 计算每个学生每种knowledge的百分比</span></span>
+<span id="cb40-7"><a href="#cb40-7" aria-hidden="true" tabindex="-1"></a>knowledge_percentage <span class="ot">&lt;-</span> sub_info <span class="sc">%&gt;%</span></span>
+<span id="cb40-8"><a href="#cb40-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(student_ID, knowledge) <span class="sc">%&gt;%</span></span>
+<span id="cb40-9"><a href="#cb40-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">counts =</span> <span class="fu">n</span>()) <span class="sc">%&gt;%</span></span>
+<span id="cb40-10"><a href="#cb40-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb40-11"><a href="#cb40-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(student_ID) <span class="sc">%&gt;%</span></span>
+<span id="cb40-12"><a href="#cb40-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">total_counts =</span> <span class="fu">sum</span>(counts),</span>
+<span id="cb40-13"><a href="#cb40-13" aria-hidden="true" tabindex="-1"></a>         <span class="at">percentage =</span> counts <span class="sc">/</span> total_counts) <span class="sc">%&gt;%</span></span>
+<span id="cb40-14"><a href="#cb40-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(student_ID, knowledge, percentage) <span class="sc">%&gt;%</span></span>
+<span id="cb40-15"><a href="#cb40-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">spread</span>(<span class="at">key =</span> knowledge, <span class="at">value =</span> percentage, <span class="at">fill =</span> <span class="dv">0</span>)</span>
+<span id="cb40-16"><a href="#cb40-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-17"><a href="#cb40-17" aria-hidden="true" tabindex="-1"></a><span class="co"># 合并学生信息和计算结果</span></span>
+<span id="cb40-18"><a href="#cb40-18" aria-hidden="true" tabindex="-1"></a>final_data <span class="ot">&lt;-</span> stu_info <span class="sc">%&gt;%</span></span>
+<span id="cb40-19"><a href="#cb40-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>index) <span class="sc">%&gt;%</span></span>
+<span id="cb40-20"><a href="#cb40-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(avg_rate, <span class="at">by =</span> <span class="st">"student_ID"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb40-21"><a href="#cb40-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(sub_info <span class="sc">%&gt;%</span> <span class="fu">select</span>(student_ID, day) <span class="sc">%&gt;%</span> <span class="fu">distinct</span>(), <span class="at">by =</span> <span class="st">"student_ID"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb40-22"><a href="#cb40-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(knowledge_percentage, <span class="at">by =</span> <span class="st">"student_ID"</span>)</span>
+<span id="cb40-23"><a href="#cb40-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-24"><a href="#cb40-24" aria-hidden="true" tabindex="-1"></a><span class="co"># 查看结果</span></span>
+<span id="cb40-25"><a href="#cb40-25" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(final_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>            student_ID    sex age  major average_rate day      b3C9s      g7R2j
+1 8b6d1125760bd3939b6e female  24 J23517    0.5187266   2 0.07865169 0.06741573
+2 8b6d1125760bd3939b6e female  24 J23517    0.5187266   3 0.07865169 0.06741573
+3 8b6d1125760bd3939b6e female  24 J23517    0.5187266   4 0.07865169 0.06741573
+4 63eef37311aaac915a45 female  21 J87654    0.1597715   2 0.01654846 0.05437352
+5 63eef37311aaac915a45 female  21 J87654    0.1597715   7 0.01654846 0.05437352
+6 63eef37311aaac915a45 female  21 J87654    0.1597715   4 0.01654846 0.05437352
+       k4W1c     m3D1v      r8S3g      s8Y2f     t5V9e     y9W5d
+1 0.02247191 0.2247191 0.32584270 0.02247191 0.1011236 0.1573034
+2 0.02247191 0.2247191 0.32584270 0.02247191 0.1011236 0.1573034
+3 0.02247191 0.2247191 0.32584270 0.02247191 0.1011236 0.1573034
+4 0.00000000 0.4018913 0.07801418 0.05673759 0.1229314 0.2695035
+5 0.00000000 0.4018913 0.07801418 0.05673759 0.1229314 0.2695035
+6 0.00000000 0.4018913 0.07801418 0.05673759 0.1229314 0.2695035</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="fu">write.csv</span>(final_data,<span class="st">'data/final_data.csv'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+</section>
+</section>
+<section id="clustering-analysis" class="level1">
+<h1>3 Clustering Analysis</h1>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist"><li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-2-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-1" role="tab" aria-controls="tabset-2-1" aria-selected="true">code</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-2" role="tab" aria-controls="tabset-2-2" aria-selected="false">elbow plot</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-3" role="tab" aria-controls="tabset-2-3" aria-selected="false">PCA scatter plot</a></li><li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-4-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-4" role="tab" aria-controls="tabset-2-4" aria-selected="false">radar plot</a></li></ul>
+<div class="tab-content">
+<div id="tabset-2-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-2-1-tab">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>cluster_data <span class="ot">&lt;-</span> final_data <span class="sc">%&gt;%</span></span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(b3C9s, g7R2j, k4W1c, m3D1v, r8S3g, s8Y2f, t5V9e, y9W5d)</span>
+<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a>cluster_data[<span class="fu">is.na</span>(cluster_data)] <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a>cluster_data_scaled <span class="ot">&lt;-</span> <span class="fu">scale</span>(cluster_data)</span>
+<span id="cb43-5"><a href="#cb43-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-6"><a href="#cb43-6" aria-hidden="true" tabindex="-1"></a><span class="co"># define the number of clusters</span></span>
+<span id="cb43-7"><a href="#cb43-7" aria-hidden="true" tabindex="-1"></a>wss <span class="ot">&lt;-</span> (<span class="fu">nrow</span>(cluster_data_scaled)<span class="sc">-</span><span class="dv">1</span>)<span class="sc">*</span><span class="fu">sum</span>(<span class="fu">apply</span>(cluster_data_scaled, <span class="dv">2</span>, var))</span>
+<span id="cb43-8"><a href="#cb43-8" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">2</span><span class="sc">:</span><span class="dv">15</span>) wss[i] <span class="ot">&lt;-</span> <span class="fu">sum</span>(<span class="fu">kmeans</span>(cluster_data_scaled, <span class="at">centers=</span>i)<span class="sc">$</span>tot.withinss)</span>
+<span id="cb43-9"><a href="#cb43-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-10"><a href="#cb43-10" aria-hidden="true" tabindex="-1"></a><span class="co"># elbow plot</span></span>
+<span id="cb43-11"><a href="#cb43-11" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">15</span>, wss, <span class="at">type=</span><span class="st">"b"</span>, <span class="at">xlab=</span><span class="st">"Number of Clusters"</span>, <span class="at">ylab=</span><span class="st">"Within groups sum of squares"</span>)</span>
+<span id="cb43-12"><a href="#cb43-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-13"><a href="#cb43-13" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb43-14"><a href="#cb43-14" aria-hidden="true" tabindex="-1"></a>kmeans_result <span class="ot">&lt;-</span> <span class="fu">kmeans</span>(cluster_data_scaled, <span class="at">centers=</span><span class="dv">3</span>, <span class="at">nstart=</span><span class="dv">20</span>)</span>
+<span id="cb43-15"><a href="#cb43-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-16"><a href="#cb43-16" aria-hidden="true" tabindex="-1"></a>final_data <span class="ot">&lt;-</span> final_data <span class="sc">%&gt;%</span></span>
+<span id="cb43-17"><a href="#cb43-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">cluster =</span> kmeans_result<span class="sc">$</span>cluster)</span>
+<span id="cb43-18"><a href="#cb43-18" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(final_data)</span>
+<span id="cb43-19"><a href="#cb43-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-20"><a href="#cb43-20" aria-hidden="true" tabindex="-1"></a>cluster_means <span class="ot">&lt;-</span> final_data <span class="sc">%&gt;%</span></span>
+<span id="cb43-21"><a href="#cb43-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(cluster) <span class="sc">%&gt;%</span></span>
+<span id="cb43-22"><a href="#cb43-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="fu">across</span>(<span class="fu">c</span>(b3C9s, g7R2j, k4W1c, m3D1v, r8S3g, s8Y2f, t5V9e, y9W5d), mean, <span class="at">na.rm =</span> <span class="cn">TRUE</span>))</span>
+<span id="cb43-23"><a href="#cb43-23" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(cluster_means)</span>
+<span id="cb43-24"><a href="#cb43-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-25"><a href="#cb43-25" aria-hidden="true" tabindex="-1"></a><span class="co"># PCA scatter plot</span></span>
+<span id="cb43-26"><a href="#cb43-26" aria-hidden="true" tabindex="-1"></a>pca <span class="ot">&lt;-</span> <span class="fu">prcomp</span>(cluster_data_scaled)</span>
+<span id="cb43-27"><a href="#cb43-27" aria-hidden="true" tabindex="-1"></a>pca_data <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(pca<span class="sc">$</span>x[, <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>], <span class="at">cluster=</span><span class="fu">as.factor</span>(final_data<span class="sc">$</span>cluster))</span>
+<span id="cb43-28"><a href="#cb43-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-29"><a href="#cb43-29" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(pca_data, <span class="fu">aes</span>(<span class="at">x =</span> PC1, <span class="at">y =</span> PC2, <span class="at">color =</span> cluster)) <span class="sc">+</span> </span>
+<span id="cb43-30"><a href="#cb43-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span> </span>
+<span id="cb43-31"><a href="#cb43-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title=</span><span class="st">"K-means Clustering"</span>, <span class="at">x=</span><span class="st">"Principal Component 1"</span>, <span class="at">y=</span><span class="st">"Principal Component 2"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 排除第一列计算最大值和最小值</span></span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>max_values <span class="ot">&lt;-</span> <span class="fu">apply</span>(cluster_means[, <span class="sc">-</span><span class="dv">1</span>], <span class="dv">2</span>, max)</span>
+<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a>min_values <span class="ot">&lt;-</span> <span class="fu">apply</span>(cluster_means[, <span class="sc">-</span><span class="dv">1</span>], <span class="dv">2</span>, min)</span>
+<span id="cb44-4"><a href="#cb44-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-5"><a href="#cb44-5" aria-hidden="true" tabindex="-1"></a><span class="co"># 将最大值行、最小值行和聚类均值数据结合起来</span></span>
+<span id="cb44-6"><a href="#cb44-6" aria-hidden="true" tabindex="-1"></a>radar_data <span class="ot">&lt;-</span> <span class="fu">rbind</span>(max_values, min_values, cluster_means[, <span class="sc">-</span><span class="dv">1</span>])</span>
+<span id="cb44-7"><a href="#cb44-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-8"><a href="#cb44-8" aria-hidden="true" tabindex="-1"></a><span class="co"># 查看准备好的数据</span></span>
+<span id="cb44-9"><a href="#cb44-9" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(radar_data)</span>
+<span id="cb44-10"><a href="#cb44-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-11"><a href="#cb44-11" aria-hidden="true" tabindex="-1"></a><span class="co"># 生成雷达图</span></span>
+<span id="cb44-12"><a href="#cb44-12" aria-hidden="true" tabindex="-1"></a>colors_border <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"blue"</span>, <span class="st">"green"</span>, <span class="st">"red"</span>, <span class="st">"orange"</span>, <span class="st">"purple"</span>)</span>
+<span id="cb44-13"><a href="#cb44-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-14"><a href="#cb44-14" aria-hidden="true" tabindex="-1"></a><span class="co"># 生成雷达图</span></span>
+<span id="cb44-15"><a href="#cb44-15" aria-hidden="true" tabindex="-1"></a><span class="fu">radarchart</span>(radar_data, <span class="at">axistype =</span> <span class="dv">1</span>,</span>
+<span id="cb44-16"><a href="#cb44-16" aria-hidden="true" tabindex="-1"></a>           <span class="at">pcol =</span> colors_border, <span class="at">plwd =</span> <span class="dv">2</span>, <span class="at">plty =</span> <span class="dv">1</span>,</span>
+<span id="cb44-17"><a href="#cb44-17" aria-hidden="true" tabindex="-1"></a>           <span class="at">cglcol =</span> <span class="st">"grey"</span>, <span class="at">cglty =</span> <span class="dv">1</span>, <span class="at">cglwd =</span> <span class="fl">0.8</span>,</span>
+<span id="cb44-18"><a href="#cb44-18" aria-hidden="true" tabindex="-1"></a>           <span class="at">vlcex =</span> <span class="fl">0.8</span>, <span class="at">title =</span> <span class="st">"Cluster Comparison Radar Chart"</span>)</span>
+<span id="cb44-19"><a href="#cb44-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-20"><a href="#cb44-20" aria-hidden="true" tabindex="-1"></a><span class="co"># 添加图例</span></span>
+<span id="cb44-21"><a href="#cb44-21" aria-hidden="true" tabindex="-1"></a><span class="fu">legend</span>(<span class="at">x =</span> <span class="st">"topright"</span>, <span class="at">legend =</span> <span class="fu">rownames</span>(cluster_means), <span class="at">bty =</span> <span class="st">"n"</span>,</span>
+<span id="cb44-22"><a href="#cb44-22" aria-hidden="true" tabindex="-1"></a>       <span class="at">pch =</span> <span class="dv">20</span>, <span class="at">col =</span> colors_border, <span class="at">text.col =</span> <span class="st">"grey"</span>, <span class="at">cex =</span> <span class="fl">1.2</span>, <span class="at">pt.cex =</span> <span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+<div id="tabset-2-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-2-tab">
+<p><img src="images/clipboard-3716576842.png" class="img-fluid"></p>
+</div>
+<div id="tabset-2-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-3-tab">
+<p><img src="images/clipboard-2838082180.png" class="img-fluid"></p>
+</div>
+<div id="tabset-2-4" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-4-tab">
+<p><img src="images/clipboard-1014584142.png" class="img-fluid"></p>
+</div>
+</div>
+</div>
+</section>
+<section id="conclusions" class="level1">
+<h1>4 Conclusions</h1>
+<p><strong>Radar Chart Analysis</strong></p>
+<p>The radar chart shows the comparison of knowledge distribution across three clusters. Here are the key observations:</p>
+<pre><code>1.  **Cluster 1 (Blue)**
+
+•   Exhibits a balanced performance across most knowledge areas, with relatively high percentages in y9W5d, g7R2j, and t5V9e.
+
+•   It shows the highest values in several knowledge areas, indicating a well-rounded skill set among the students in this cluster.
+
+2.  **Cluster 2 (Green)**
+
+•   Shows a distinctive peak in r8S3g, suggesting that students in this cluster excel particularly in this knowledge area.
+
+•   Has lower percentages in areas like t5V9e and y9W5d compared to the other clusters.
+
+3.  **Cluster 3 (Red)**
+
+•   Dominates in m3D1v and k4W1c, indicating a specialized skill set focused on these areas.
+
+•   Displays lower values in other knowledge areas such as g7R2j and b3C9s.</code></pre>
+<p>Overall, the radar chart indicates that each cluster has distinct strengths and weaknesses across different knowledge areas.</p>
+<p><strong>PCA Scatter Plot Analysis</strong></p>
+<p>The PCA scatter plot visualizes the distribution of students based on their principal components, colored by their assigned clusters:</p>
+<pre><code>1.  **Cluster Separation**
+
+•   The three clusters are well-separated in the PCA space, indicating that the clustering algorithm effectively distinguished between different student groups.
+
+2.  **Cluster Characteristics**
+
+•   The separation suggests that students within each cluster share similar characteristics and knowledge distributions.
+
+•   The spread of points within each cluster implies some degree of variability, with Cluster 2 appearing to be the most dispersed.</code></pre>
+<p><strong>Summary</strong></p>
+<p>The combined analysis of the radar chart and PCA scatter plot indicates that the clustering algorithm successfully identified three distinct groups of students with unique knowledge profiles. Cluster 1 has a balanced and well-rounded skill set, Cluster 2 is specialized in specific areas, and Cluster 3 shows a different specialization pattern. The clear separation in the PCA plot further supports the validity of these clusters.</p>
+
+
 </section>
 
 </main> <!-- /main -->
