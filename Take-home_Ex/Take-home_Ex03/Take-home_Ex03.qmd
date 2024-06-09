@@ -379,44 +379,38 @@ legend(x = "topright", legend = rownames(cluster_means), bty = "n",
 
 # 4 Conclusions
 
-**Radar Chart Analysis**
+## **Radar Chart Analysis**
 
-The radar chart shows the comparison of knowledge distribution across three clusters. Here are the key observations:
+The radar chart shows the comparison of knowledge distribution across three clusters. Here are the key observations: 1. Cluster 1 (Blue) • Exhibits a balanced performance across most knowledge areas, with relatively high percentages in y9W5d, g7R2j, and t5V9e. • It shows the highest values in several knowledge areas, indicating a well-rounded skill set among the students in this cluster.
 
-	1.	**Cluster 1 (Blue)**
+2.  Cluster 2 (Green)
 
-	•	Exhibits a balanced performance across most knowledge areas, with relatively high percentages in y9W5d, g7R2j, and t5V9e.
+    • Shows a distinctive peak in r8S3g, suggesting that students in this cluster excel particularly in this knowledge area.
 
-	•	It shows the highest values in several knowledge areas, indicating a well-rounded skill set among the students in this cluster.
+    • Has lower percentages in areas like t5V9e and y9W5d compared to the other clusters.
 
-	2.	**Cluster 2 (Green)**
+3.  Cluster 3 (Red)
 
-	•	Shows a distinctive peak in r8S3g, suggesting that students in this cluster excel particularly in this knowledge area.
+    • Dominates in m3D1v and k4W1c, indicating a specialized skill set focused on these areas.
 
-	•	Has lower percentages in areas like t5V9e and y9W5d compared to the other clusters.
-
-	3.	**Cluster 3 (Red)**
-
-	•	Dominates in m3D1v and k4W1c, indicating a specialized skill set focused on these areas.
-
-	•	Displays lower values in other knowledge areas such as g7R2j and b3C9s.
+    • Displays lower values in other knowledge areas such as g7R2j and b3C9s.
 
 Overall, the radar chart indicates that each cluster has distinct strengths and weaknesses across different knowledge areas.
 
-**PCA Scatter Plot Analysis**
+## **PCA Scatter Plot Analysis**
 
 The PCA scatter plot visualizes the distribution of students based on their principal components, colored by their assigned clusters:
 
-	1.	**Cluster Separation**
+1.  Cluster Separation
 
-	•	The three clusters are well-separated in the PCA space, indicating that the clustering algorithm effectively distinguished between different student groups.
+    • The three clusters are well-separated in the PCA space, indicating that the clustering algorithm effectively distinguished between different student groups.
 
-	2.	**Cluster Characteristics**
+2.  Cluster Characteristics
 
-	•	The separation suggests that students within each cluster share similar characteristics and knowledge distributions.
+    • The separation suggests that students within each cluster share similar characteristics and knowledge distributions.
 
-	•	The spread of points within each cluster implies some degree of variability, with Cluster 2 appearing to be the most dispersed.
+    • The spread of points within each cluster implies some degree of variability, with Cluster 2 appearing to be the most dispersed.
 
-**Summary**
+## **Summary**
 
 The combined analysis of the radar chart and PCA scatter plot indicates that the clustering algorithm successfully identified three distinct groups of students with unique knowledge profiles. Cluster 1 has a balanced and well-rounded skill set, Cluster 2 is specialized in specific areas, and Cluster 3 shows a different specialization pattern. The clear separation in the PCA plot further supports the validity of these clusters.

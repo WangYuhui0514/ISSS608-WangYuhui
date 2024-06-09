@@ -230,7 +230,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </ul></li>
   </ul></li>
   <li><a href="#clustering-analysis" id="toc-clustering-analysis" class="nav-link" data-scroll-target="#clustering-analysis">3 Clustering Analysis</a></li>
-  <li><a href="#conclusions" id="toc-conclusions" class="nav-link" data-scroll-target="#conclusions">4 Conclusions</a></li>
+  <li><a href="#conclusions" id="toc-conclusions" class="nav-link" data-scroll-target="#conclusions">4 Conclusions</a>
+  <ul class="collapse">
+  <li><a href="#radar-chart-analysis" id="toc-radar-chart-analysis" class="nav-link" data-scroll-target="#radar-chart-analysis"><strong>Radar Chart Analysis</strong></a></li>
+  <li><a href="#pca-scatter-plot-analysis" id="toc-pca-scatter-plot-analysis" class="nav-link" data-scroll-target="#pca-scatter-plot-analysis"><strong>PCA Scatter Plot Analysis</strong></a></li>
+  <li><a href="#summary" id="toc-summary" class="nav-link" data-scroll-target="#summary"><strong>Summary</strong></a></li>
+  </ul></li>
   </ul>
 </nav>
     </div>
@@ -860,41 +865,36 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="conclusions" class="level1">
 <h1>4 Conclusions</h1>
-<p><strong>Radar Chart Analysis</strong></p>
-<p>The radar chart shows the comparison of knowledge distribution across three clusters. Here are the key observations:</p>
-<pre><code>1.  **Cluster 1 (Blue)**
-
-•   Exhibits a balanced performance across most knowledge areas, with relatively high percentages in y9W5d, g7R2j, and t5V9e.
-
-•   It shows the highest values in several knowledge areas, indicating a well-rounded skill set among the students in this cluster.
-
-2.  **Cluster 2 (Green)**
-
-•   Shows a distinctive peak in r8S3g, suggesting that students in this cluster excel particularly in this knowledge area.
-
-•   Has lower percentages in areas like t5V9e and y9W5d compared to the other clusters.
-
-3.  **Cluster 3 (Red)**
-
-•   Dominates in m3D1v and k4W1c, indicating a specialized skill set focused on these areas.
-
-•   Displays lower values in other knowledge areas such as g7R2j and b3C9s.</code></pre>
+<section id="radar-chart-analysis" class="level2">
+<h2 class="anchored" data-anchor-id="radar-chart-analysis"><strong>Radar Chart Analysis</strong></h2>
+<p>The radar chart shows the comparison of knowledge distribution across three clusters. Here are the key observations: 1. Cluster 1 (Blue) • Exhibits a balanced performance across most knowledge areas, with relatively high percentages in y9W5d, g7R2j, and t5V9e. • It shows the highest values in several knowledge areas, indicating a well-rounded skill set among the students in this cluster.</p>
+<ol start="2" type="1">
+<li><p>Cluster 2 (Green)</p>
+<p>• Shows a distinctive peak in r8S3g, suggesting that students in this cluster excel particularly in this knowledge area.</p>
+<p>• Has lower percentages in areas like t5V9e and y9W5d compared to the other clusters.</p></li>
+<li><p>Cluster 3 (Red)</p>
+<p>• Dominates in m3D1v and k4W1c, indicating a specialized skill set focused on these areas.</p>
+<p>• Displays lower values in other knowledge areas such as g7R2j and b3C9s.</p></li>
+</ol>
 <p>Overall, the radar chart indicates that each cluster has distinct strengths and weaknesses across different knowledge areas.</p>
-<p><strong>PCA Scatter Plot Analysis</strong></p>
+</section>
+<section id="pca-scatter-plot-analysis" class="level2">
+<h2 class="anchored" data-anchor-id="pca-scatter-plot-analysis"><strong>PCA Scatter Plot Analysis</strong></h2>
 <p>The PCA scatter plot visualizes the distribution of students based on their principal components, colored by their assigned clusters:</p>
-<pre><code>1.  **Cluster Separation**
-
-•   The three clusters are well-separated in the PCA space, indicating that the clustering algorithm effectively distinguished between different student groups.
-
-2.  **Cluster Characteristics**
-
-•   The separation suggests that students within each cluster share similar characteristics and knowledge distributions.
-
-•   The spread of points within each cluster implies some degree of variability, with Cluster 2 appearing to be the most dispersed.</code></pre>
-<p><strong>Summary</strong></p>
+<ol type="1">
+<li><p>Cluster Separation</p>
+<p>• The three clusters are well-separated in the PCA space, indicating that the clustering algorithm effectively distinguished between different student groups.</p></li>
+<li><p>Cluster Characteristics</p>
+<p>• The separation suggests that students within each cluster share similar characteristics and knowledge distributions.</p>
+<p>• The spread of points within each cluster implies some degree of variability, with Cluster 2 appearing to be the most dispersed.</p></li>
+</ol>
+</section>
+<section id="summary" class="level2">
+<h2 class="anchored" data-anchor-id="summary"><strong>Summary</strong></h2>
 <p>The combined analysis of the radar chart and PCA scatter plot indicates that the clustering algorithm successfully identified three distinct groups of students with unique knowledge profiles. Cluster 1 has a balanced and well-rounded skill set, Cluster 2 is specialized in specific areas, and Cluster 3 shows a different specialization pattern. The clear separation in the PCA plot further supports the validity of these clusters.</p>
 
 
+</section>
 </section>
 
 </main> <!-- /main -->
